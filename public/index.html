@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>聊天室</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div v-if="flag">
+            <input type="text" v-model.trim="username">
+            <button @click="btnloginFn">登录</button>
+        </div>
+        <div v-else>
+            <ul>
+                <li v-for="(item, index) in msgsList" :key="index">
+                    <p>
+                        <span>{{item.username}}:{{item.msgs}}</span>
+                    </p>
+                </li>
+            </ul>
+            <!-- 输入框 -->
+            <span>你好~{{username}}</span>
+            <input type="text" placeholder="你想向谁发送" v-model.trim="targetUser">
+            <div>-----------------------</div>
+            <input type="text" v-model.trim="msgs">
+            <button @click="btnSendFn">发送</button>
+        </div>
+    </div>
+</body>
+<script src="./vue.js"></script>
+<script>
+    const app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                // msg: '', // 公共消息
+                // msgList: [], // 公共消息列表
+                username: '',
+                msgsList: [], // 私人聊天消息列表
+                msgs: '', // 私人消息
+                targetUser: '',
+                flag: true,
+                Socket: null,
+            }
+        },
+        created() {
+            this.Socket = io.connect('ws://localhost:8000');
+        },
+        methods: {
+            btnloginFn() {
+                this.flag = false
+                this.Socket.emit('login', this.username)
+            },
+            btnSendFn() {
+                this.Socket.emit('sends', JSON.stringify({
+                    msgs: this.msgs,
+                    targetUser: this.targetUser,
+                    username: this.username
+                }))
+
+
+                this.Socket.on('addData', res => {
+                    console.log(JSON.parse(res));
+                    this.msgsList.push(JSON.parse(res))
+                })
+            },
+        },
+    })
+</script>
+
+</html>
+
+</html>
