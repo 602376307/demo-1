@@ -1,12 +1,3 @@
-// const express = require("express")
-// const app = express()
-// app.use(express.static(__dirname + '/public'))
-
-
-// var http = require('http').Server(app);
-// http.listen(4005)
-// var io = require('socket.io')(http);
-
 const express = require('express');
 const app = express(); // 初始化express
 const http = require('http').Server(app); // 创建个Http服务器
@@ -35,13 +26,21 @@ io.on('connection', (socket) => {
         console.log(res);
         // io.sockets.emit('msgs', res)
         let tar = JSON.parse(res).targetUser
-        console.log(tar);
-        // console.log(userObj);
-        // console.log(userObj[tar]);
-        // io.sockets.emit('addData', res) 广播
-        userObj[tar].emit('addData', res) // 私聊
+            // console.log(tar);
+            // console.log(userObj);
+            // console.log(userObj[tar]);
+        if (tar) {
+            userObj[tar].emit('addData', res) // 私聊
+        } else {
+            io.sockets.emit('addData', res) // 广播
+        }
     })
 })
+
+
+
+
+
 
 // io.on('connection', function(socket) { // socket连接者对象
 //     console.log('a user connected');

@@ -53,6 +53,10 @@
         },
         created() {
             this.Socket = io.connect('ws://localhost:8000');
+            this.Socket.on('addData', res => {
+                console.log(JSON.parse(res));
+                this.msgsList.push(JSON.parse(res))
+            })
         },
         methods: {
             btnloginFn() {
@@ -66,11 +70,14 @@
                     username: this.username
                 }))
 
-
-                this.Socket.on('addData', res => {
-                    console.log(JSON.parse(res));
-                    this.msgsList.push(JSON.parse(res))
-                })
+                if (this.targetUser) {
+                    this.msgsList.push({
+                        msgs: this.msgs,
+                        targetUser: this.targetUser,
+                        username: this.username
+                    })
+                }
+                this.msgs = ''
             },
         },
     })
